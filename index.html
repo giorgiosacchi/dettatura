@@ -1,143 +1,322 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Dettatura vocale italiana</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0ea5e9" />
+  <title>Dettatura vocale (smartphone/tablet)</title>
   <style>
     :root{
-      --bg:#f3f6fb; --card:#ffffff; --text:#1f2937; --muted:#6b7280;
-      --primary:#2563eb; --danger:#dc2626; --ok:#059669; --border:#d1d5db;
+      --bg:#0b1220;          /* scuro ma non nero per OLED */
+      --card:#0f172a;        /* slate-900 */
+      --muted:#6b7280;       /* gray-500 */
+      --text:#e5e7eb;        /* gray-200 */
+      --accent:#0ea5e9;      /* sky-500 */
+      --accent-2:#22c55e;    /* green-500 */
+      --danger:#ef4444;      /* red-500 */
     }
     *{box-sizing:border-box}
-    body{margin:0;padding:16px;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
-    .wrap{max-width:760px;margin:0 auto;background:var(--card);border-radius:18px;padding:18px;box-shadow:0 8px 24px rgba(0,0,0,.08)}
-    h1{margin:0 0 8px 0;text-align:center;font-size:clamp(1.4rem,4vw,2rem)}
-    .note{margin:0 0 14px 0;text-align:center;color:var(--muted);line-height:1.4;font-size:.98rem}
-    .row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px}
-    button{min-height:54px;border:none;border-radius:14px;font-size:1rem;font-weight:700;cursor:pointer;padding:12px}
-    #startBtn{background:var(--primary);color:#fff}
-    #stopBtn{background:var(--danger);color:#fff}
-    #clearBtn{background:#e5e7eb;color:#111827}
-    #status{margin:10px 0 12px;padding:12px;border-radius:12px;background:#eef2ff;color:#1e3a8a;font-weight:700;text-align:center;line-height:1.35}
-    #status.ok{background:#ecfdf5;color:var(--ok)}
-    #status.err{background:#fef2f2;color:#991b1b}
-    textarea{width:100%;min-height:320px;resize:vertical;border:1px solid var(--border);border-radius:14px;padding:14px;font-size:1.08rem;line-height:1.5;color:var(--text)}
-    .small{margin-top:12px;color:var(--muted);font-size:.94rem;line-height:1.5}
-    code{background:#f3f4f6;padding:2px 5px;border-radius:6px}
-    @media (max-width:560px){.row{grid-template-columns:1fr} textarea{min-height:250px;font-size:1rem}}
+    html,body{height:100%}
+    body{
+      margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background:linear-gradient(180deg, #0b1220 0%, #0a0f1a 100%);
+      color:var(--text);
+      display:flex; flex-direction:column; gap:12px;
+    }
+    header{padding:16px 20px 0}
+    h1{font-size:20px; font-weight:700; margin:0 0 6px}
+    p.sub{margin:0; color:var(--muted); font-size:14px}
+
+    .card{
+      background:rgba(15,23,42,.7);
+      backdrop-filter: blur(8px);
+      border:1px solid rgba(148,163,184,.15);
+      border-radius:16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+      margin: 10px 14px;
+      padding: 14px;
+    }
+
+    .controls{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+    .row{display:flex; gap:10px; align-items:center}
+
+    select, button, .pill{
+      font-size:16px; border-radius:12px; border:1px solid rgba(148,163,184,.2);
+      background:#0b1530; color:var(--text);
+      padding:10px 14px; 
+    }
+    select{background:#0a1530}
+    button{cursor:pointer}
+    button:disabled{opacity:.6; cursor:not-allowed}
+
+    .micBtn{
+      flex:1 1 auto; 
+      display:flex; align-items:center; justify-content:center; gap:10px;
+      font-weight:700; padding:16px; font-size:18px;
+      background:linear-gradient(180deg, #0ea5e9, #0284c7);
+      border:none; color:white; border-radius:16px;
+      box-shadow: 0 10px 20px rgba(2,132,199,.35);
+      transition: transform .06s ease, box-shadow .2s ease, background .2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .micBtn:active{ transform: scale(.98) }
+    .micBtn.listening{
+      background: linear-gradient(180deg, #22c55e, #16a34a);
+      box-shadow: 0 10px 22px rgba(34,197,94,.35);
+    }
+
+    .status{font-size:14px; color:var(--muted)}
+
+    .transcript{
+      min-height: 30vh; max-height: 45vh; overflow:auto; 
+      background:#0b1220; border-radius:12px; padding:12px; 
+      border:1px dashed rgba(148,163,184,.25);
+      line-height:1.6; font-size:18px;
+      white-space: pre-wrap; word-break: break-word;
+    }
+    .interim{opacity:.6}
+
+    .grid{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+    .grid button{width:100%}
+
+    footer{padding: 0 20px 18px; color:var(--muted); font-size:12px}
+    a{color:#7dd3fc}
+
+    @media (min-width:700px){
+      body{max-width:760px; margin:0 auto}
+    }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <h1>Dettatura vocale in italiano</h1>
-    <p class="note">Premi <strong>Inizia dettatura</strong>, consenti il microfono e parla in italiano.</p>
+  <header>
+    <h1>Dettatura vocale</h1>
+    <p class="sub">Tocca il microfono e parla. Funziona al meglio su Android/Chrome. iOS Safari può non supportare il riconoscimento.</p>
+  </header>
 
-    <div class="row">
-      <button id="startBtn">🎤 Inizia dettatura</button>
-      <button id="stopBtn">⏹ Ferma</button>
-      <button id="clearBtn">🧹 Cancella testo</button>
+  <section class="card">
+    <div class="controls">
+      <button id="mic" class="micBtn" aria-pressed="false">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3Zm6-3a6 6 0 0 1-12 0M12 19v3" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span id="micLabel">Avvia dettatura</span>
+      </button>
+      <div class="row" style="flex:1 1 100%">
+        <label for="lang" class="pill" style="background:transparent; border:none; padding-left:0">Lingua:</label>
+        <select id="lang" aria-label="Lingua riconoscimento">
+          <option value="it-IT" selected>Italiano (Italia)</option>
+          <option value="en-US">English (US)</option>
+          <option value="es-ES">Español (España)</option>
+          <option value="fr-FR">Français (France)</option>
+          <option value="de-DE">Deutsch (Deutschland)</option>
+        </select>
+        <label class="pill" style="display:flex; gap:8px; align-items:center; background:transparent; border:none">
+          <input type="checkbox" id="continuous" checked aria-label="Dettatura continua"/> Continua
+        </label>
+        <label class="pill" style="display:flex; gap:8px; align-items:center; background:transparent; border:none">
+          <input type="checkbox" id="interim" checked aria-label="Mostra risultati intermedi"/> Intermedio
+        </label>
+      </div>
+      <div class="status" id="status">Pronto.</div>
     </div>
+  </section>
 
-    <div id="status">Pronta.</div>
-
-    <textarea id="output" placeholder="Qui comparirà il testo dettato..."></textarea>
-
-    <div class="small">
-      Su molti smartphone Android il riconoscimento vocale nel browser funziona meglio in <strong>Chrome</strong> e spesso richiede una pagina aperta in <code>https://</code> oppure <code>localhost</code>. Se apri il file direttamente come <code>file://</code>, su alcuni telefoni può non partire.
+  <section class="card">
+    <div id="output" class="transcript" role="region" aria-live="polite" aria-label="Trascrizione"></div>
+    <div class="grid" style="margin-top:12px">
+      <button id="copyBtn" title="Copia negli appunti">Copia</button>
+      <button id="clearBtn" title="Svuota trascrizione">Pulisci</button>
+      <button id="saveBtn" title="Salva come .txt">Salva .txt</button>
+      <button id="stopBtn" title="Ferma dettatura">Ferma</button>
     </div>
-  </div>
+  </section>
+
+  <footer>
+    <div id="supportNote"></div>
+  </footer>
 
   <script>
-    const output = document.getElementById('output');
-    const statusBox = document.getElementById('status');
-    const startBtn = document.getElementById('startBtn');
-    const stopBtn = document.getElementById('stopBtn');
-    const clearBtn = document.getElementById('clearBtn');
+    (function(){
+      const output = document.getElementById('output');
+      const micBtn = document.getElementById('mic');
+      const micLabel = document.getElementById('micLabel');
+      const statusEl = document.getElementById('status');
+      const copyBtn = document.getElementById('copyBtn');
+      const clearBtn = document.getElementById('clearBtn');
+      const saveBtn = document.getElementById('saveBtn');
+      const stopBtn = document.getElementById('stopBtn');
+      const langSel = document.getElementById('lang');
+      const interimCk = document.getElementById('interim');
+      const contCk = document.getElementById('continuous');
+      const supportNote = document.getElementById('supportNote');
 
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    let recognition = null;
-    let isListening = false;
-    let finalTranscript = "";
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      let recog = null;
+      let listening = false;
+      let interimSpan = null;
 
-    function setStatus(msg, mode){
-      statusBox.textContent = msg;
-      statusBox.className = "";
-      if(mode === "ok") statusBox.classList.add("ok");
-      if(mode === "err") statusBox.classList.add("err");
-    }
+      // Persist small preferences
+      try{
+        const savedLang = localStorage.getItem('sr_lang');
+        if(savedLang) langSel.value = savedLang;
+        const savedInterim = localStorage.getItem('sr_interim');
+        if(savedInterim!==null) interimCk.checked = savedInterim === '1';
+        const savedCont = localStorage.getItem('sr_cont');
+        if(savedCont!==null) contCk.checked = savedCont === '1';
+      }catch(e){}
 
-    if (!SpeechRecognition) {
-      setStatus("Questo browser non supporta il riconoscimento vocale Web Speech.", "err");
-      startBtn.disabled = true;
-      stopBtn.disabled = true;
-    } else {
-      recognition = new SpeechRecognition();
-      recognition.lang = "it-IT";
-      recognition.continuous = true;
-      recognition.interimResults = true;
-      recognition.maxAlternatives = 1;
+      function appendText(text){
+        // ensure spacing between chunks
+        const needsSpace = output.textContent && !/\s$/.test(output.textContent);
+        output.textContent += (needsSpace ? ' ' : '') + text;
+        autoScroll();
+      }
+      function setInterim(text){
+        if(!interimSpan){
+          interimSpan = document.createElement('span');
+          interimSpan.className = 'interim';
+          output.appendChild(document.createTextNode(output.textContent && !/\s$/.test(output.textContent) ? ' ' : ''));
+          output.appendChild(interimSpan);
+        }
+        interimSpan.textContent = text;
+        autoScroll();
+      }
+      function clearInterim(){
+        if(interimSpan){
+          interimSpan.remove();
+          interimSpan = null;
+        }
+      }
+      function autoScroll(){
+        output.scrollTop = output.scrollHeight;
+      }
 
-      recognition.onstart = function () {
-        isListening = true;
-        setStatus("Ascolto in corso...", "ok");
-      };
+      function setStatus(msg){ statusEl.textContent = msg; }
+      function setUI(listen){
+        listening = listen;
+        micBtn.classList.toggle('listening', listen);
+        micBtn.setAttribute('aria-pressed', listen? 'true':'false');
+        micLabel.textContent = listen ? 'Sto ascoltando…' : 'Avvia dettatura';
+      }
 
-      recognition.onresult = function (event) {
-        let interimTranscript = "";
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const transcript = event.results[i][0].transcript;
-          if (event.results[i].isFinal) {
-            finalTranscript += transcript + " ";
-          } else {
-            interimTranscript += transcript;
+      function createRecognizer(){
+        if(!SR) return null;
+        const r = new SR();
+        r.lang = langSel.value;
+        r.continuous = contCk.checked; // continuous mode for long dictation
+        r.interimResults = interimCk.checked; // show interim results
+        r.maxAlternatives = 1;
+        return r;
+      }
+
+      function start(){
+        if(!SR){
+          setStatus('Riconoscimento vocale non supportato su questo browser.');
+          supportNote.innerHTML = 'Suggerimento: usa <b>Google Chrome</b> su Android. Su iPhone/iPad, Safari in genere <i>non</i> supporta il Web Speech API.';
+          return;
+        }
+        if(listening) return;
+        recog = createRecognizer();
+        if(!recog){ setStatus('Impossibile iniziare il riconoscimento.'); return; }
+
+        // iOS/Android: riconoscimento richiede gesto utente; questo handler è chiamato da un tap
+        try{
+          setUI(true); setStatus('Richiesta autorizzazione microfono…');
+          recog.start();
+        }catch(err){
+          console.error(err);
+          setUI(false);
+          setStatus('Errore avvio: ' + (err.message || err.name || err));
+        }
+
+        recog.onstart = () => setStatus('In ascolto…');
+        recog.onaudiostart = () => setStatus('Audio rilevato…');
+        recog.onspeechstart = () => setStatus('Parla pure.');
+        recog.onspeechend = () => setStatus('Pausa…');
+        recog.onaudioend = () => setStatus('Audio terminato.');
+
+        recog.onresult = (evt) => {
+          for(let i = evt.resultIndex; i < evt.results.length; i++){
+            const res = evt.results[i];
+            const text = res[0].transcript.trim();
+            if(res.isFinal){
+              clearInterim();
+              if(text) appendText(text);
+            }else if(interimCk.checked){
+              setInterim(text);
+            }
           }
-        }
-        output.value = finalTranscript + interimTranscript;
-      };
+        };
 
-      recognition.onerror = function (event) {
-        let msg = "Errore: " + event.error;
-        if (event.error === "not-allowed") {
-          msg = "Microfono non autorizzato. Devi consentire il microfono al browser.";
-        } else if (event.error === "service-not-allowed") {
-          msg = "Servizio vocale non consentito dal browser o dal telefono.";
-        } else if (event.error === "network") {
-          msg = "Errore di rete del servizio vocale.";
-        } else if (event.error === "no-speech") {
-          msg = "Non ho rilevato voce. Riprova parlando subito dopo l'avvio.";
-        } else if (event.error === "audio-capture") {
-          msg = "Microfono non disponibile o occupato da un'altra app.";
-        }
-        setStatus(msg, "err");
-        isListening = false;
-      };
+        recog.onerror = (evt) => {
+          const m = evt.error === 'no-speech' ? 'Nessuna voce rilevata.' :
+                    evt.error === 'not-allowed' ? 'Permesso microfono negato.' :
+                    evt.error === 'aborted' ? 'Interrotto.' :
+                    `Errore: ${evt.error || 'sconosciuto'}`;
+          setStatus(m);
+          clearInterim();
+          setUI(false);
+        };
 
-      recognition.onend = function () {
-        isListening = false;
-        setStatus("Dettatura fermata.");
-      };
+        recog.onend = () => {
+          // In modalità continua Chrome a volte chiude la sessione: proviamo a riaprire se l'utente non ha premuto stop
+          if(listening && contCk.checked){
+            try{ recog.start(); }catch(e){ setUI(false); }
+          }else{
+            setUI(false); clearInterim();
+            setStatus('Terminato.');
+          }
+        };
+      }
 
-      startBtn.addEventListener("click", function () {
-        try {
-          if (isListening) return;
-          finalTranscript = output.value ? output.value.trim() + " " : "";
-          recognition.start();
-        } catch (e) {
-          setStatus("Impossibile avviare la dettatura in questo contesto.", "err");
+      function stop(){
+        if(recog){ try{ recog.stop(); }catch(e){} }
+        setUI(false); setStatus('Inattivo.'); clearInterim();
+      }
+
+      micBtn.addEventListener('click', start);
+      stopBtn.addEventListener('click', stop);
+
+      langSel.addEventListener('change', () => {
+        try{ localStorage.setItem('sr_lang', langSel.value); }catch(e){}
+        if(listening){ stop(); setTimeout(start, 50); }
+      });
+      interimCk.addEventListener('change', ()=>{ try{ localStorage.setItem('sr_interim', interimCk.checked?'1':'0'); }catch(e){} });
+      contCk.addEventListener('change', ()=>{ try{ localStorage.setItem('sr_cont', contCk.checked?'1':'0'); }catch(e){} });
+
+      copyBtn.addEventListener('click', async () => {
+        const text = output.textContent.trim();
+        if(!text){ setStatus('Nulla da copiare.'); return; }
+        try{
+          await navigator.clipboard.writeText(text);
+          setStatus('Copiato negli appunti.');
+        }catch(e){
+          setStatus('Impossibile copiare automaticamente. Seleziona e copia a mano.');
         }
       });
 
-      stopBtn.addEventListener("click", function () {
-        if (recognition && isListening) recognition.stop();
+      clearBtn.addEventListener('click', () => {
+        output.textContent = ''; clearInterim(); setStatus('Pulito.');
       });
 
-      clearBtn.addEventListener("click", function () {
-        output.value = "";
-        finalTranscript = "";
-        setStatus("Testo cancellato.");
+      saveBtn.addEventListener('click', () => {
+        const text = output.textContent.trim();
+        const blob = new Blob([text], {type:'text/plain;charset=utf-8'});
+        const a = document.createElement('a');
+        const ts = new Date().toISOString().replace(/[:.]/g,'-');
+        a.href = URL.createObjectURL(blob);
+        a.download = `dettatura-${ts}.txt`;
+        document.body.appendChild(a); a.click(); a.remove();
+        setStatus('File salvato.');
       });
-    }
+
+      // Feature detection note
+      if(!SR){
+        supportNote.innerHTML = '⚠️ Il tuo browser non espone il <code>Web Speech API</code>. Prova con Chrome su Android o un browser basato su Chromium. Su iOS potrebbe non funzionare.';
+      } else {
+        supportNote.textContent = 'Suggerimento: dettatura continua può riavviarsi automaticamente se la sessione si chiude.';
+      }
+    })();
   </script>
 </body>
 </html>
