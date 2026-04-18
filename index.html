@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0ea5e9" />
-  <title>Dettatura vocale (smartphone/tablet)</title>
+  <title>Dettatura vocale - versione severa</title>
   <style>
     :root{
       --bg:#0b1220;
@@ -13,33 +13,30 @@
       --text:#e5e7eb;
       --accent:#0ea5e9;
       --accent-2:#22c55e;
-      --danger:#ef4444;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
       margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-      background:linear-gradient(180deg, #0b1220 0%, #0a0f1a 100%);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      background:linear-gradient(180deg,#0b1220 0%,#0a0f1a 100%);
       color:var(--text);
-      display:flex;
-      flex-direction:column;
-      gap:12px;
+      display:flex; flex-direction:column; gap:12px;
     }
     header{padding:16px 20px 0}
     h1{font-size:20px; font-weight:700; margin:0 0 6px}
     p.sub{margin:0; color:var(--muted); font-size:14px}
     .card{
       background:rgba(15,23,42,.7);
-      backdrop-filter: blur(8px);
+      backdrop-filter:blur(8px);
       border:1px solid rgba(148,163,184,.15);
       border-radius:16px;
-      box-shadow: 0 10px 30px rgba(0,0,0,.35);
-      margin: 10px 14px;
-      padding: 14px;
+      box-shadow:0 10px 30px rgba(0,0,0,.35);
+      margin:10px 14px;
+      padding:14px;
     }
     .controls{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
-    .row{display:flex; gap:10px; align-items:center}
+    .row{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
     select, button, .pill{
       font-size:16px;
       border-radius:12px;
@@ -48,57 +45,43 @@
       color:var(--text);
       padding:10px 14px;
     }
-    select{background:#0a1530}
     button{cursor:pointer}
     button:disabled{opacity:.6; cursor:not-allowed}
     .micBtn{
       flex:1 1 auto;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-      font-weight:700;
-      padding:16px;
-      font-size:18px;
-      background:linear-gradient(180deg, #0ea5e9, #0284c7);
-      border:none;
-      color:white;
-      border-radius:16px;
-      box-shadow: 0 10px 20px rgba(2,132,199,.35);
-      transition: transform .06s ease, box-shadow .2s ease, background .2s ease;
-      -webkit-tap-highlight-color: transparent;
+      display:flex; align-items:center; justify-content:center; gap:10px;
+      font-weight:700; padding:16px; font-size:18px;
+      background:linear-gradient(180deg,#0ea5e9,#0284c7);
+      border:none; color:white; border-radius:16px;
+      box-shadow:0 10px 20px rgba(2,132,199,.35);
+      transition:transform .06s ease, box-shadow .2s ease, background .2s ease;
+      -webkit-tap-highlight-color:transparent;
     }
-    .micBtn:active{ transform: scale(.98) }
+    .micBtn:active{transform:scale(.98)}
     .micBtn.listening{
-      background: linear-gradient(180deg, #22c55e, #16a34a);
-      box-shadow: 0 10px 22px rgba(34,197,94,.35);
+      background:linear-gradient(180deg,#22c55e,#16a34a);
+      box-shadow:0 10px 22px rgba(34,197,94,.35);
     }
     .status{font-size:14px; color:var(--muted)}
     .transcript{
-      min-height: 30vh;
-      max-height: 45vh;
-      overflow:auto;
-      background:#0b1220;
-      border-radius:12px;
-      padding:12px;
+      min-height:30vh; max-height:45vh; overflow:auto;
+      background:#0b1220; border-radius:12px; padding:12px;
       border:1px dashed rgba(148,163,184,.25);
-      line-height:1.6;
-      font-size:18px;
-      white-space: pre-wrap;
-      word-break: break-word;
+      line-height:1.6; font-size:18px;
+      white-space:pre-wrap; word-break:break-word;
     }
     .grid{display:grid; grid-template-columns:1fr 1fr; gap:10px}
     .grid button{width:100%}
-    footer{padding: 0 20px 18px; color:var(--muted); font-size:12px}
-    @media (min-width:700px){
-      body{max-width:760px; margin:0 auto}
-    }
+    .note{font-size:13px; color:var(--muted); margin-top:10px}
+    footer{padding:0 20px 18px; color:var(--muted); font-size:12px}
+    code{background:#111827; padding:2px 6px; border-radius:8px}
+    @media (min-width:700px){body{max-width:760px; margin:0 auto}}
   </style>
 </head>
 <body>
   <header>
-    <h1>Dettatura vocale</h1>
-    <p class="sub">Tocca il microfono e parla. Funziona al meglio su Android/Chrome. iOS Safari può non supportare il riconoscimento.</p>
+    <h1>Dettatura vocale - versione severa</h1>
+    <p class="sub">Più prudente contro i raddoppi: niente testo intermedio visibile e filtro aggressivo sulle sovrapposizioni.</p>
   </header>
 
   <section class="card">
@@ -109,7 +92,7 @@
         </svg>
         <span id="micLabel">Avvia dettatura</span>
       </button>
-      <div class="row" style="flex:1 1 100%; flex-wrap:wrap">
+      <div class="row" style="flex:1 1 100%">
         <label for="lang" class="pill" style="background:transparent; border:none; padding-left:0">Lingua:</label>
         <select id="lang" aria-label="Lingua riconoscimento">
           <option value="it-IT" selected>Italiano (Italia)</option>
@@ -121,21 +104,19 @@
         <label class="pill" style="display:flex; gap:8px; align-items:center; background:transparent; border:none">
           <input type="checkbox" id="continuous" checked aria-label="Dettatura continua"/> Continua
         </label>
-        <label class="pill" style="display:flex; gap:8px; align-items:center; background:transparent; border:none">
-          <input type="checkbox" id="interim" checked aria-label="Mostra risultati intermedi"/> Intermedio
-        </label>
       </div>
       <div class="status" id="status">Pronto.</div>
     </div>
+    <div class="note">Modalità severa: il testo viene aggiunto solo quando il motore lo considera finale.</div>
   </section>
 
   <section class="card">
     <div id="output" class="transcript" role="region" aria-live="polite" aria-label="Trascrizione"></div>
     <div class="grid" style="margin-top:12px">
-      <button id="copyBtn" title="Copia negli appunti">Copia</button>
-      <button id="clearBtn" title="Svuota trascrizione">Pulisci</button>
-      <button id="saveBtn" title="Salva come .txt">Salva .txt</button>
-      <button id="stopBtn" title="Ferma dettatura">Ferma</button>
+      <button id="copyBtn">Copia</button>
+      <button id="clearBtn">Pulisci</button>
+      <button id="saveBtn">Salva .txt</button>
+      <button id="stopBtn">Ferma</button>
     </div>
   </section>
 
@@ -154,7 +135,6 @@
       const saveBtn = document.getElementById('saveBtn');
       const stopBtn = document.getElementById('stopBtn');
       const langSel = document.getElementById('lang');
-      const interimCk = document.getElementById('interim');
       const contCk = document.getElementById('continuous');
       const supportNote = document.getElementById('supportNote');
 
@@ -162,53 +142,107 @@
       let recog = null;
       let listening = false;
       let shouldRestart = false;
+      let restartTimer = null;
       let finalText = '';
-      let interimText = '';
-      let lastFinalChunk = '';
+      let lastFinalNorm = '';
+      let recentlyAccepted = [];
 
       try{
         const savedLang = localStorage.getItem('sr_lang');
         if(savedLang) langSel.value = savedLang;
-        const savedInterim = localStorage.getItem('sr_interim');
-        if(savedInterim !== null) interimCk.checked = savedInterim === '1';
         const savedCont = localStorage.getItem('sr_cont');
-        if(savedCont !== null) contCk.checked = savedCont === '1';
+        if(savedCont!==null) contCk.checked = savedCont === '1';
       }catch(e){}
 
-      function renderOutput(){
-        const sep = finalText && interimText && !/\s$/.test(finalText) ? ' ' : '';
-        output.textContent = finalText + sep + interimText;
+      function setStatus(msg){ statusEl.textContent = msg; }
+      function render(){
+        output.textContent = finalText;
         output.scrollTop = output.scrollHeight;
       }
-
-      function setStatus(msg){ statusEl.textContent = msg; }
-
-      function setUI(listen){
-        listening = listen;
-        micBtn.classList.toggle('listening', listen);
-        micBtn.setAttribute('aria-pressed', listen ? 'true' : 'false');
-        micLabel.textContent = listen ? 'Sto ascoltando…' : 'Avvia dettatura';
+      function setUI(on){
+        listening = on;
+        micBtn.classList.toggle('listening', on);
+        micBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+        micLabel.textContent = on ? 'Sto ascoltando…' : 'Avvia dettatura';
       }
 
-      function appendFinal(text){
-        const clean = (text || '').trim();
-        if(!clean) return;
+      function normalizeSpaces(s){
+        return s.replace(/\s+/g,' ').trim();
+      }
+      function normalizeCompare(s){
+        return normalizeSpaces(s)
+          .toLowerCase()
+          .replace(/[.,;:!?]+/g,'')
+          .replace(/\s+/g,' ')
+          .trim();
+      }
+      function words(s){
+        return normalizeCompare(s).split(' ').filter(Boolean);
+      }
+      function wordOverlap(a, b){
+        const wa = words(a);
+        const wb = words(b);
+        const max = Math.min(wa.length, wb.length);
+        for(let k = max; k >= 1; k--){
+          let ok = true;
+          for(let i = 0; i < k; i++){
+            if(wa[wa.length - k + i] !== wb[i]){ ok = false; break; }
+          }
+          if(ok) return k;
+        }
+        return 0;
+      }
+      function mergeByOverlap(existing, incoming){
+        const cleanExisting = normalizeSpaces(existing);
+        const cleanIncoming = normalizeSpaces(incoming);
+        if(!cleanIncoming) return cleanExisting;
+        if(!cleanExisting) return cleanIncoming;
 
-        if(clean === lastFinalChunk) return;
+        const normExisting = normalizeCompare(cleanExisting);
+        const normIncoming = normalizeCompare(cleanIncoming);
 
-        if(finalText && !/\s$/.test(finalText)) finalText += ' ';
-        finalText += clean;
-        lastFinalChunk = clean;
-        interimText = '';
-        renderOutput();
+        if(normExisting === normIncoming) return cleanExisting;
+        if(normExisting.endsWith(normIncoming)) return cleanExisting;
+        if(normExisting.includes(normIncoming)) return cleanExisting;
+
+        const overlap = wordOverlap(cleanExisting, cleanIncoming);
+        if(overlap > 0){
+          const incomingWordsOriginal = normalizeSpaces(cleanIncoming).split(/\s+/);
+          const tail = incomingWordsOriginal.slice(overlap).join(' ');
+          return tail ? (cleanExisting + ' ' + tail) : cleanExisting;
+        }
+
+        return cleanExisting + ' ' + cleanIncoming;
+      }
+      function isMostlyCovered(newText){
+        const normNew = normalizeCompare(newText);
+        if(!normNew) return true;
+        if(lastFinalNorm && (lastFinalNorm === normNew || lastFinalNorm.includes(normNew) || normNew.includes(lastFinalNorm))) return true;
+        return recentlyAccepted.some(x => x === normNew || x.includes(normNew) || normNew.includes(x));
+      }
+      function acceptChunk(text){
+        const clean = normalizeSpaces(text);
+        if(!clean) return false;
+        if(isMostlyCovered(clean)) return false;
+
+        const merged = mergeByOverlap(finalText, clean);
+        const beforeNorm = normalizeCompare(finalText);
+        const afterNorm = normalizeCompare(merged);
+        if(beforeNorm === afterNorm) return false;
+
+        finalText = merged;
+        lastFinalNorm = normalizeCompare(clean);
+        recentlyAccepted.push(lastFinalNorm);
+        if(recentlyAccepted.length > 8) recentlyAccepted.shift();
+        render();
+        return true;
       }
 
       function createRecognizer(){
-        if(!SR) return null;
         const r = new SR();
         r.lang = langSel.value;
         r.continuous = contCk.checked;
-        r.interimResults = interimCk.checked;
+        r.interimResults = false; // severa: niente intermedi
         r.maxAlternatives = 1;
         return r;
       }
@@ -218,26 +252,17 @@
         r.onaudiostart = () => setStatus('Audio rilevato…');
         r.onspeechstart = () => setStatus('Parla pure.');
         r.onspeechend = () => setStatus('Pausa…');
-        r.onaudioend = () => setStatus('Audio terminato.');
-
         r.onresult = (evt) => {
-          let newInterim = '';
-
+          let acceptedAny = false;
           for(let i = evt.resultIndex; i < evt.results.length; i++){
             const res = evt.results[i];
             const text = (res[0] && res[0].transcript ? res[0].transcript : '').trim();
-
             if(res.isFinal){
-              appendFinal(text);
-            } else if(interimCk.checked && text){
-              newInterim += (newInterim ? ' ' : '') + text;
+              acceptedAny = acceptChunk(text) || acceptedAny;
             }
           }
-
-          interimText = newInterim;
-          renderOutput();
+          if(acceptedAny) setStatus('Testo aggiunto.');
         };
-
         r.onerror = (evt) => {
           const m = evt.error === 'no-speech' ? 'Nessuna voce rilevata.' :
                     evt.error === 'not-allowed' ? 'Permesso microfono negato.' :
@@ -245,19 +270,22 @@
                     `Errore: ${evt.error || 'sconosciuto'}`;
           setStatus(m);
         };
-
         r.onend = () => {
           if(shouldRestart && contCk.checked){
-            try{
-              recog = createRecognizer();
-              bindRecognizer(recog);
-              recog.start();
-              return;
-            }catch(e){}
+            clearTimeout(restartTimer);
+            restartTimer = setTimeout(() => {
+              try{
+                recog = createRecognizer();
+                bindRecognizer(recog);
+                recog.start();
+              }catch(e){
+                setUI(false);
+                setStatus('Terminato.');
+              }
+            }, 350);
+            return;
           }
           setUI(false);
-          interimText = '';
-          renderOutput();
           setStatus('Terminato.');
         };
       }
@@ -265,37 +293,30 @@
       function start(){
         if(!SR){
           setStatus('Riconoscimento vocale non supportato su questo browser.');
-          supportNote.innerHTML = 'Suggerimento: usa <b>Google Chrome</b> su Android. Su iPhone/iPad, Safari in genere non supporta il Web Speech API.';
+          supportNote.innerHTML = 'Suggerimento: usa <b>Google Chrome</b> su Android.';
           return;
         }
         if(listening) return;
-
         shouldRestart = true;
+        clearTimeout(restartTimer);
         recog = createRecognizer();
-        if(!recog){
-          setStatus('Impossibile iniziare il riconoscimento.');
-          return;
-        }
         bindRecognizer(recog);
-
         try{
           setUI(true);
           setStatus('Richiesta autorizzazione microfono…');
           recog.start();
         }catch(err){
-          console.error(err);
-          setUI(false);
           shouldRestart = false;
+          setUI(false);
           setStatus('Errore avvio: ' + (err.message || err.name || err));
         }
       }
 
       function stop(){
         shouldRestart = false;
+        clearTimeout(restartTimer);
         if(recog){ try{ recog.stop(); }catch(e){} }
         setUI(false);
-        interimText = '';
-        renderOutput();
         setStatus('Inattivo.');
       }
 
@@ -304,40 +325,38 @@
 
       langSel.addEventListener('change', () => {
         try{ localStorage.setItem('sr_lang', langSel.value); }catch(e){}
-        if(listening){
-          stop();
-          setTimeout(start, 80);
-        }
+        if(listening){ stop(); setTimeout(start, 300); }
       });
-      interimCk.addEventListener('change', ()=>{ try{ localStorage.setItem('sr_interim', interimCk.checked ? '1' : '0'); }catch(e){} });
-      contCk.addEventListener('change', ()=>{ try{ localStorage.setItem('sr_cont', contCk.checked ? '1' : '0'); }catch(e){} });
+      contCk.addEventListener('change', () => {
+        try{ localStorage.setItem('sr_cont', contCk.checked ? '1' : '0'); }catch(e){}
+      });
 
       copyBtn.addEventListener('click', async () => {
-        const text = (finalText + (interimText ? ' ' + interimText : '')).trim();
+        const text = finalText.trim();
         if(!text){ setStatus('Nulla da copiare.'); return; }
         try{
           await navigator.clipboard.writeText(text);
           setStatus('Copiato negli appunti.');
         }catch(e){
-          setStatus('Impossibile copiare automaticamente. Seleziona e copia a mano.');
+          setStatus('Impossibile copiare automaticamente.');
         }
       });
 
       clearBtn.addEventListener('click', () => {
         finalText = '';
-        interimText = '';
-        lastFinalChunk = '';
-        renderOutput();
+        lastFinalNorm = '';
+        recentlyAccepted = [];
+        render();
         setStatus('Pulito.');
       });
 
       saveBtn.addEventListener('click', () => {
-        const text = (finalText + (interimText ? ' ' + interimText : '')).trim();
+        const text = finalText.trim();
         const blob = new Blob([text], {type:'text/plain;charset=utf-8'});
         const a = document.createElement('a');
         const ts = new Date().toISOString().replace(/[:.]/g,'-');
         a.href = URL.createObjectURL(blob);
-        a.download = `dettatura-${ts}.txt`;
+        a.download = `dettatura-severa-${ts}.txt`;
         document.body.appendChild(a);
         a.click();
         a.remove();
@@ -345,9 +364,9 @@
       });
 
       if(!SR){
-        supportNote.innerHTML = '⚠️ Il tuo browser non espone il <code>Web Speech API</code>. Prova con Chrome su Android o un browser basato su Chromium. Su iOS potrebbe non funzionare.';
+        supportNote.innerHTML = '⚠️ Il tuo browser non espone il <code>Web Speech API</code>. Prova con Chrome su Android.';
       } else {
-        supportNote.textContent = 'Suggerimento: la dettatura continua può riavviarsi automaticamente se la sessione si chiude.';
+        supportNote.textContent = 'Questa versione sacrifica un po’ di immediatezza per ridurre le ripetizioni.';
       }
     })();
   </script>
