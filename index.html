@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Dettatura vocale italiana</title>
+  <style>
+    :root{
+      --bg:#f3f6fb; --card:#ffffff; --text:#1f2937; --muted:#6b7280;
+      --primary:#2563eb; --danger:#dc2626; --ok:#059669; --border:#d1d5db;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;padding:16px;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
+    .wrap{max-width:760px;margin:0 auto;background:var(--card);border-radius:18px;padding:18px;box-shadow:0 8px 24px rgba(0,0,0,.08)}
+    h1{margin:0 0 8px 0;text-align:center;font-size:clamp(1.4rem,4vw,2rem)}
+    .note{margin:0 0 14px 0;text-align:center;color:var(--muted);line-height:1.4;font-size:.98rem}
+    .row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px}
+    button{min-height:54px;border:none;border-radius:14px;font-size:1rem;font-weight:700;cursor:pointer;padding:12px}
+    #startBtn{background:var(--primary);color:#fff}
+    #stopBtn{background:var(--danger);color:#fff}
+    #clearBtn{background:#e5e7eb;color:#111827}
+    #status{margin:10px 0 12px;padding:12px;border-radius:12px;background:#eef2ff;color:#1e3a8a;font-weight:700;text-align:center;line-height:1.35}
+    #status.ok{background:#ecfdf5;color:var(--ok)}
+    #status.err{background:#fef2f2;color:#991b1b}
+    textarea{width:100%;min-height:320px;resize:vertical;border:1px solid var(--border);border-radius:14px;padding:14px;font-size:1.08rem;line-height:1.5;color:var(--text)}
+    .small{margin-top:12px;color:var(--muted);font-size:.94rem;line-height:1.5}
+    code{background:#f3f4f6;padding:2px 5px;border-radius:6px}
+    @media (max-width:560px){.row{grid-template-columns:1fr} textarea{min-height:250px;font-size:1rem}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Dettatura vocale in italiano</h1>
+    <p class="note">Premi <strong>Inizia dettatura</strong>, consenti il microfono e parla in italiano.</p>
+
+    <div class="row">
+      <button id="startBtn">🎤 Inizia dettatura</button>
+      <button id="stopBtn">⏹ Ferma</button>
+      <button id="clearBtn">🧹 Cancella testo</button>
+    </div>
+
+    <div id="status">Pronta.</div>
+
+    <textarea id="output" placeholder="Qui comparirà il testo dettato..."></textarea>
+
+    <div class="small">
+      Su molti smartphone Android il riconoscimento vocale nel browser funziona meglio in <strong>Chrome</strong> e spesso richiede una pagina aperta in <code>https://</code> oppure <code>localhost</code>. Se apri il file direttamente come <code>file://</code>, su alcuni telefoni può non partire.
+    </div>
+  </div>
+
+  <script>
+    const output = document.getElementById('output');
+    const statusBox = document.getElementById('status');
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const clearBtn = document.getElementById('clearBtn');
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition = null;
+    let isListening = false;
+    let finalTranscript = "";
+
+    function setStatus(msg, mode){
+      statusBox.textContent = msg;
+      statusBox.className = "";
+      if(mode === "ok") statusBox.classList.add("ok");
+      if(mode === "err") statusBox.classList.add("err");
+    }
+
+    if (!SpeechRecognition) {
+      setStatus("Questo browser non supporta il riconoscimento vocale Web Speech.", "err");
+      startBtn.disabled = true;
+      stopBtn.disabled = true;
+    } else {
+      recognition = new SpeechRecognition();
+      recognition.lang = "it-IT";
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.maxAlternatives = 1;
+
+      recognition.onstart = function () {
+        isListening = true;
+        setStatus("Ascolto in corso...", "ok");
+      };
+
+      recognition.onresult = function (event) {
+        let interimTranscript = "";
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            finalTranscript += transcript + " ";
+          } else {
+            interimTranscript += transcript;
+          }
+        }
+        output.value = finalTranscript + interimTranscript;
+      };
+
+      recognition.onerror = function (event) {
+        let msg = "Errore: " + event.error;
+        if (event.error === "not-allowed") {
+          msg = "Microfono non autorizzato. Devi consentire il microfono al browser.";
+        } else if (event.error === "service-not-allowed") {
+          msg = "Servizio vocale non consentito dal browser o dal telefono.";
+        } else if (event.error === "network") {
+          msg = "Errore di rete del servizio vocale.";
+        } else if (event.error === "no-speech") {
+          msg = "Non ho rilevato voce. Riprova parlando subito dopo l'avvio.";
+        } else if (event.error === "audio-capture") {
+          msg = "Microfono non disponibile o occupato da un'altra app.";
+        }
+        setStatus(msg, "err");
+        isListening = false;
+      };
+
+      recognition.onend = function () {
+        isListening = false;
+        setStatus("Dettatura fermata.");
+      };
+
+      startBtn.addEventListener("click", function () {
+        try {
+          if (isListening) return;
+          finalTranscript = output.value ? output.value.trim() + " " : "";
+          recognition.start();
+        } catch (e) {
+          setStatus("Impossibile avviare la dettatura in questo contesto.", "err");
+        }
+      });
+
+      stopBtn.addEventListener("click", function () {
+        if (recognition && isListening) recognition.stop();
+      });
+
+      clearBtn.addEventListener("click", function () {
+        output.value = "";
+        finalTranscript = "";
+        setStatus("Testo cancellato.");
+      });
+    }
+  </script>
+</body>
+</html>
